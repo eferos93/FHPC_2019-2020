@@ -39,9 +39,10 @@
 
 int main( void )
 {
-
+  //this array leaves in the stack
   int array[ 3 ];
-
+  //this for loop is not correct as array[3] doesn't exists
+  // result: STACK SMASHING ERROR
   for ( int ii = 0; ii <= 3; ii++ )
     array[ ii ] = ii;
 
