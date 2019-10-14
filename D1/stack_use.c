@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
+#include <math.h> // compile with -lm at the end
 //#include <sys/resource.h>
 
 
@@ -168,7 +168,7 @@ int access_the_heap_dp ( void )
   return 0;
 }
 
-
+//returns a pointer to a char
 char * function_1 ( void )
 {
 

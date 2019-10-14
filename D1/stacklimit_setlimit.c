@@ -108,17 +108,21 @@ int main(int argc, char **argv)
 {
   unsigned int  S;
   struct rlimit stack_limits;
-  
+  //populates the structure stack_limits
   getrlimit(RLIMIT_STACK, &stack_limits);
       
 
   // get the memory to be allocated in KB
   if(argc > 1)
-    
-    S = (unsigned int)((int)(atof(*(argv+1)) * 1024));
+    //*(argv+1) acces value pointed from the second value (a pointer to a string) of argv
+    //atoi() ASCII to int
+    //(int) casts to int
+    //(unsigned int) casts to unsigned int
+    S = (unsigned int)(atoi(*(argv+1)) * 1024);
   
   else
     {
+      //rlim_cur: the current soft limit
       S = stack_limits.rlim_cur;
       
       printf("\nyou did not give a memory amount to be allocated, "
@@ -136,7 +140,7 @@ int main(int argc, char **argv)
   if( (long int)stack_limits.rlim_cur <= MaxS )
     {
       if( ( (long int)stack_limits.rlim_max < 0 ) ||
-	  ( (long int)stack_limits.rlim_max > MaxS ) )
+	        ( (long int)stack_limits.rlim_max > MaxS ) )
 	// in this case you can enlarge the soft limit because either
 	// the hard limit is not set or it is larger than the requested memory
 	{
