@@ -114,10 +114,14 @@ int main(int argc, char **argv)
 
   // get the memory to be allocated in KB
   if(argc > 1)
+<<<<<<< HEAD
     //*(argv+1) acces value pointed from the second value (a pointer to a string) of argv
     //atoi() ASCII to int
     //(int) casts to int
     //(unsigned int) casts to unsigned int
+=======
+    
+>>>>>>> 6d1356165839fa5c0704da20dd5923b11f6d6d4d
     S = (unsigned int)(atoi(*(argv+1)) * 1024);
   
   else
