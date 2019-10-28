@@ -16,6 +16,9 @@
  * +-------------------------------------+
  */
 
+//MACRO
+// pre compiler substitues whenever it encounter the macro with the value associated
+// 
 #define DEFAULT_ARG1 100
 #define PI           3.14159265358979323846
 

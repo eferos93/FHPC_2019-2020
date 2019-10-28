@@ -27,25 +27,30 @@
 #include <stdio.h>
 #include <string.h>
 
+//compile with gcc -c -o name program
+//execute with: gdb name_executable
+//in the debugger, type r to execute
+// break main -> create a breakpoint 
+// break line_number -> adds breakpoint a the given line
+// c -> continue
+// p var_name -> prints the value of the variable
+// next -> 
+
 
 int main ( int argc, char **argv )
 {
 
   if ( argc > 1)
     // remember: arg 0 is the name of the program itself
-    {
-      
-      printf( "\nexploring my %d argument%c:\n", argc-1, (argc>2)?'s':' ' );
-      for ( int i = 1; i < argc; i++ )       
-	{
-	  printf( "\targument %d is : %s\n", i, *(argv+i) );
-	}
-      printf( "\n" );
-	
-    }
-  
+  {   
+    printf( "\nexploring my %d argument%c:\n", argc-1, (argc>2)?'s':' ' );
+    for ( int i = 1; i < argc; i++ )       
+	  {
+	    printf( "\targument %d is : %s\n", i, *(argv+i) );
+	  }
+    printf( "\n" );
+  }
   else
-    
     printf ( "no arguments were given\n\n" );
 
   return 0;
