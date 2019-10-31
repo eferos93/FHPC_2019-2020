@@ -1,0 +1,7 @@
+#include "header.ih"
+
+int main()
+{
+    fn1();
+    fn2();
+}
