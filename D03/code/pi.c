@@ -49,7 +49,7 @@ int main (int argc, char ** argv) {
       // check if the point P(x,y) is inside the circle
       if ((x*x + y*y)<1)
 	M++; 
-    }
+    } 
   pi = 4.0*M/N ; // calculate area
   end_time=clock();
   printf ( "\n # of trials = %llu , estimate of pi is %1.9f \n", N, pi ) ;

@@ -72,8 +72,8 @@ int main ( int argc , char *argv[ ] )
     end_time=MPI_Wtime();
     printf ( "\n # of trials = %llu , estimate of pi is %1.9f \n", N*numprocs, pi ) ;
     printf ( "\n # walltime on master processor : %10.8f \n", end_time - start_time ) ;
-  }
-  else {   // for all the slave processes send results to the master /
+  } else {   
+    // for all the slave processes send results to the master /
 
 //    printf ( " Processor %d sending results = %llu to master process \n", myid, local_M) ;
 //    int time_to_sleep=1*myid;
