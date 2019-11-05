@@ -25,7 +25,6 @@ int main(int argc , char *argv[ ]) {
     MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
     MPI_Comm_rank(MPI_COMM_WORLD,&myid);
     
-    if(myid == master) { 
         start = MPI_Wtime();
         FILE* file = fopen ("./input.txt", "r");
         fscanf (file, "%llu", &array_length);    
@@ -36,16 +35,15 @@ int main(int argc , char *argv[ ]) {
         fclose (file);        
         end = MPI_Wtime();
         printf("T_read: %f\n", end-start);
-    }
 
 
     long long  int interval = array_length/numprocs;
     int remainder = array_length % numprocs;
-
+    printf("Remainder: %i\n", remainder);
     if(myid == master) {
         long long int *sum = (long long int*)malloc(sizeof(sum));
         *sum = 0;
-        long long  int *array = (long long  int*)malloc( (interval+remainder) * sizeof(long long  int));
+        long long int *array = (long long  int*)malloc( (interval+remainder) * sizeof(long long  int));
         
         for(i=0; i< interval+remainder; i++) {
             array[i] = i;
@@ -54,6 +52,8 @@ int main(int argc , char *argv[ ]) {
             *sum = *sum + array[i];
             if(i == 0)
                 end = MPI_Wtime();
+            printf("proc: %i; array[%i] = %lli\n", myid, i, array[i]);
+
         }
         
         printf("T_comp: %f\n", end-start);
@@ -76,12 +76,12 @@ int main(int argc , char *argv[ ]) {
         printf("The total sum is %llu\n", *sum);
     } else {
         MPI_Recv(&interval,sizeof(interval), MPI_LONG_LONG, master, myid, MPI_COMM_WORLD, &status);
-
-        long long int value = interval;        
+        
         long long int *array = (long long int*) malloc(interval*sizeof(long long int));
+        printf("proc: %i; interv: %lli; remainder: %i\n", myid, interval, remainder);
         for(i= 0; i < interval; i++) {
-            array[i] = value*myid+i+remainder;
-            
+            array[i] = interval*myid+i+remainder;
+            printf("proc: %i; array[%i] = %lli\n", myid, i, array[i]);
         }
         
         for(i = 0; i< interval; i++) {
