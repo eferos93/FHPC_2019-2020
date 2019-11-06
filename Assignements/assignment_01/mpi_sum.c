@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <math.h>
 #include <string.h>
 #include <mpi.h>
 
@@ -81,9 +80,7 @@ int main(int argc , char *argv[ ]) {
 
         for(proc=1; proc<numprocs; proc++) {
             MPI_Recv(&local_sum, sizeof(local_sum), MPI_LONG_LONG, proc, tag, MPI_COMM_WORLD, &status);
-            printf("Master received: %lli; from: %i\n", local_sum, proc);
             *sum = *sum + local_sum;
-            printf("Sum after recv from proc %i: %lli", proc, *sum);
         }
         end_proc = MPI_Wtime();
         printf("Master Wtime: %f\n", end_proc-start_proc);
@@ -92,7 +89,6 @@ int main(int argc , char *argv[ ]) {
         MPI_Recv(&begin,sizeof(begin), MPI_LONG_LONG, master, tag, MPI_COMM_WORLD, &status);
         MPI_Recv(&last,sizeof(last), MPI_LONG_LONG, master, tag, MPI_COMM_WORLD, &status);
         interval = last-begin+1;
-        printf("Proc: %i; Begin: %lli; Last: %lli\n", myid, begin, last);
         long long int *array = (long long int*) malloc(interval*sizeof(long long int));
 
         for(i= 0; i < interval; i++) {
