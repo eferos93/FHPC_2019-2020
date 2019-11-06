@@ -1,0 +1,5 @@
+
+mpi_sum.x:32602 terminated with signal 11 at PC=400d9d SP=7ffd270a2e30.  Backtrace:
+mpi_sum.x[0x400d9d]
+/lib64/libc.so.6(__libc_start_main+0xfd)[0x35b021ed1d]
+mpi_sum.x[0x400a99]
