@@ -42,7 +42,7 @@ int main( int argc, char **argv )
 
 #if defined(_OPENMP)
   
-#pragma omp parallel               // this creates a parallel region
+#pragma omp parallel          // this creates a parallel region
                                    // that is encompassed by the
                                    // opening and closing { }
                                    //

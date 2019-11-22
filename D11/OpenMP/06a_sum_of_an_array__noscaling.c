@@ -110,7 +110,7 @@ int main( int argc, char **argv )
   
 #pragma omp parallel for 
     for ( int ii = 0; ii < N; ii++ )
-#pragma omp atomic
+#pragma omp atomic //for single instructions
       S += array[ii];
 
 #endif

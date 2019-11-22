@@ -54,32 +54,32 @@ int main( int argc, char **argv )
     N = atoi( *(argv+1) );
 
   // just give notice of what will happen and get the number of threads used
-#pragma omp parallel
-#pragma omp master
-    {
-      nthreads = omp_get_num_threads();
-      printf("omp summation with %d threads\n", nthreads );
-    }
+  #pragma omp parallel
+  #pragma omp master
+  {
+    nthreads = omp_get_num_threads();
+    printf("omp summation with %d threads\n", nthreads );
+  }
 
 
     // ---------------------------------------
     //  calculate
 
-    unsigned int S = 0;
+  unsigned int S = 0;
   
-#pragma  omp parallel for reduction(+:S)
+  #pragma  omp parallel for reduction(+:S)
     for ( int ii = 0; ii < N; ii++ )
-      {
-	iters++;
-	S += (unsigned int)ii;
-      }
+    {
+	      iters++;
+	      S += (unsigned int)ii;
+    }
 
 
     // ---------------------------------------
     //  finalize
 
-#pragma omp parallel
-#pragma omp critical
+  #pragma omp parallel
+  #pragma omp critical
     printf( "\tthread %d performed %d iterations\n", omp_get_thread_num(), iters );
     
     printf("Sum is %u (expected: %d)\n", S, (N-1)*N/2 );
