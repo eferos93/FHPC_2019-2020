@@ -5,13 +5,13 @@
 #include <mpi.h>
 
 int main(int argc , char *argv[ ]) {  
-    long long  int array_length = 0;
+    long long int array_length = 0;
     double start = 0.0, end = 0.0;
     double start_proc = MPI_Wtime(), end_proc=0.0;
     long long int begin, last;
-    long long  int local_sum = 0;
-    int myid , numprocs , proc, i;
-
+    long long int local_sum = 0;
+    long long int i;
+    int numprocs, myid, proc;
     MPI_Status status;
     MPI_Request request;
     
@@ -34,7 +34,7 @@ int main(int argc , char *argv[ ]) {
     printf("T_read: %f\n", end-start);
 
 
-    long long  int interval = array_length/numprocs;
+    long long int interval = array_length/numprocs;
     int remainder = array_length % numprocs;
     
     if(myid == master) {

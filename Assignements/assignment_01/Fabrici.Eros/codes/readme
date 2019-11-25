@@ -1,0 +1,12 @@
+SUM NUMBERS Compile with:
+mpicc sumNumbers_mpi.c -o sumNumbers_mpi.x
+
+MPI PI Compile with:
+mpicc mpi_pi.c -o mpi_pi.x
+
+PI Compile with:
+gcc pi.c -o pi.x
+
+Machine: Ulisse
+OpenMPI version: 1.8.3
+gcc version: 4.9.2
