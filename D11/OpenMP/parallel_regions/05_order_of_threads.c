@@ -61,7 +61,7 @@ int main( int argc, char **argv )
     nthreads = omp_get_num_threads();
 
                                    // now we impose an ordered output
-                                   // although not ina very efficient way
+                                   // although not in a very efficient way
     int done = 0;
     while (!done)
       {
@@ -77,7 +77,7 @@ int main( int argc, char **argv )
 	                           // those that succeed, print and modify the
 	                           // "order" value depends on which have been
 	                           // the previous ones and on the delay.
-#pragma critical                   
+#pragma omp critical 
 	if ( order == my_thread_id )
 	  {
 	    printf( "\tgreetings from thread num %d\n", my_thread_id );

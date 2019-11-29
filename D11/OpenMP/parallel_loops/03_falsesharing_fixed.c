@@ -1,30 +1,35 @@
-/* =============================================================================
- * This file is part of the exercises for the Lectures on 
- *   "Parallel COmputing and OpenMP Introduction"
- * given at 
- *   Scientific and High Performance Computing School 2019"
- *   @ Università di Trento
- *
- * contact: luca.tornatore@inaf.it
- *
- *     This is free software (*); you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation; either version 3 of the License, or
- *     (at your option) any later version.
- *     This code is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License 
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>
- *     
- *     (*) also, let me add, has nothing particularly precious in it; in
- *         other words, do what you want with it, with the hope it may
- *         be useful in some way
- */
+
+/* ────────────────────────────────────────────────────────────────────────── *
+ │                                                                            │
+ │ This file is part of the exercises for the Lectures on                     │
+ │   "Foundations of High Performance Computing"                              │
+ │ given at                                                                   │
+ │   Master in HPC and                                                        │
+ │   Master in Data Science and Scientific Computing                          │
+ │ @ SISSA, ICTP and University of Trieste                                    │
+ │                                                                            │
+ │ contact: luca.tornatore@inaf.it                                            │
+ │                                                                            │
+ │     This is free software; you can redistribute it and/or modify           │
+ │     it under the terms of the GNU General Public License as published by   │
+ │     the Free Software Foundation; either version 3 of the License, or      │
+ │     (at your option) any later version.                                    │
+ │     This code is distributed in the hope that it will be useful,           │
+ │     but WITHOUT ANY WARRANTY; without even the implied warranty of         │
+ │     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          │
+ │     GNU General Public License for more details.                           │
+ │                                                                            │
+ │     You should have received a copy of the GNU General Public License      │
+ │     along with this program.  If not, see <http://www.gnu.org/licenses/>   │
+ │                                                                            │
+ * ────────────────────────────────────────────────────────────────────────── */
 
 
+#if defined(__STDC__)
+#  if (__STDC_VERSION__ >= 199901L)
+#     define _XOPEN_SOURCE 700
+#  endif
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,6 +38,7 @@
 #include <sys/syscall.h>
 #include <omp.h>
 
+//#define SYS_getcpu
 
 #define N_default 100
 
@@ -47,13 +53,11 @@
 
 
 
-
 #define CPU_ID_ENTRY_IN_PROCSTAT 39
 #define HOSTNAME_MAX_LENGTH      200
 
 int read_proc__self_stat ( int, int * );
 int get_cpu_id           ( void       );
-
 
 
 
@@ -93,34 +97,33 @@ int main( int argc, char **argv )
 
   }
 
-
   for ( int ii = 0; ii < N; ii++ )
     array[ii] = (double)ii;
 
-  double S[ nthreads ];                                     // this will store the summation's chunks
-  double runtime = 0;                                       // this will be the runtime
+
+  double S[nthreads][8];                                    // this will store the summation's chunks
   
   double tstart  = CPU_TIME_W;  
 
-  memset( S, 0, nthreads*sizeof(double) );
-  
 #pragma omp parallel shared(S)
   {    
-  int    me      = omp_get_thread_num();
-    
+    int    me      = omp_get_thread_num();
+    S[me][0]       = 0;
 #pragma omp for
     for ( int ii = 0; ii < N; ii++ )
-	S[me] += array[ii];
+	S[me][0] += array[ii];
   }
 
   if ( nthreads > 1 )
     for ( int ii = 1; ii < nthreads; ii++ )
-      S[0] += S[ii];
+      S[0][0] += S[ii][0];
   
   double tend = CPU_TIME_W;
 
-  printf("Sum is %g, process took %g of wall-clock time, <%g> sec of thread-time \n", S[0], tend - tstart, runtime/nthreads );
-  
+  printf("Sum is %g, process took %g sec of wall-clock time\n\bn"
+	 "<%g> sec of thread-time \n",
+	 S[0][0], tend - tstart);
+
   free( array );
   return 0;
 }

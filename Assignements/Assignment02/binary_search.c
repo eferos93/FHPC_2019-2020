@@ -24,48 +24,90 @@
  │                                                                            │
  * ────────────────────────────────────────────────────────────────────────── */
 
-#if defined(__STDC__)
-#  if (__STDC_VERSION__ >= 199901L)
-#     define _XOPEN_SOURCE 700
-#  endif
-#endif
+
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <string.h>
-#include <omp.h>
 
 
-//
-// HINT: play a bit with this code and the
-//       environmental variables:
-//       OMP_NUM_THREADS=n_0, n_1, n_2, ...
-//       OMP_NESTED=<true|false>
-//       OMP_MAX_ACTIVE_LEVELS=n
-//
+#define CPU_TIME (clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &ts ), (double)ts.tv_sec + \
+		  (double)ts.tv_nsec * 1e-9)
 
 
-int function( int, int );
+int mybsearch(int *data, int N, int Key)
+ {
+   int register low = 0;
+   int register high = N;
+   int register mid;
 
-int main( int argc, char **argv )
+   mid = (low + high) / 2;
+   while(low <= high) {     
+
+     
+     if(data[mid] < Key)
+       low = mid + 1; 
+     else if(data[mid] > Key)
+       high = mid - 1;
+     else 
+       return mid;
+
+     mid = (low + high) / 2;
+   }
+
+   /* if ( Key == data[low] ) */
+   /*   return 0; */
+   /* else */
+     return -1;
+ }
+
+#define N_DEFAULT  (1024*1024*128)
+#define N_search_DEFAULT (N_DEFAULT / 10)
+
+int main(int argc, char **argv)
 {
-#pragma omp parallel
-  {
-    int myid = omp_get_thread_num();
-    function( myid, 0 );
-  }
+  int N, Nsearch, i;
+  int *data, *search;
+
+  if(argc > 1)
+    N = atoi( *(argv+1) );
+  else
+    N = N_DEFAULT;
+
+  if(argc > 2)
+    Nsearch = atoi ( *(argv + 2) );
+  else
+    Nsearch = N_search_DEFAULT;
+
+  printf("performing %d lookups on %d data..\n", Nsearch, N);
+
+  printf("set-up data.."); fflush(stdout);
+  data = malloc(N * sizeof(int));
+  for (i = 0; i < N; i++)
+    data[i] = i;
+
+  printf(" set-up lookups.. "); fflush(stdout);  
+  search = malloc(Nsearch * sizeof(int));
+  srand(time(NULL));
+  for (i = 0; i < Nsearch; i++)
+    search[i] = rand() % N;
+
+  int found = 0;
+  double tstart, tstop;
+  struct timespec ts;
+
+  printf("\nstart cycle.. "); fflush(stdout);
+  tstart = CPU_TIME;
+  for (i = 0; i < Nsearch; i++)
+    if( mybsearch(data, N, search[i]) >= 0)
+      found++;
+  tstop = CPU_TIME;
+
+  printf("time elapsed: %g\n", tstop - tstart);
+
+  free(data);
+  free(search);
 
   return 0;
-}
-
-
-int function( int id, int nested )
-{
-
-  printf("\tthread %2d in function\n", id );
-  
-#pragma omp parallel num_threads(2)
-  {
-    int myid = omp_get_thread_num();
-    printf("\t\tthread %2d,%2d in function\n", id, myid );
-  }
-}
+ }

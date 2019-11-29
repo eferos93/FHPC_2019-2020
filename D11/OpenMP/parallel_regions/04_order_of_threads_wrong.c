@@ -35,41 +35,57 @@
 #include <omp.h>
 
 
-
-int function( int, int );
-
 int main( int argc, char **argv )
 {
-  int nested_is_active = omp_get_nested();
-  int max_nest_level = omp_get_max_active_levels();
-  int thread_limit   = omp_get_thread_limit();
 
-  printf("nested parallelism is %s\n", (nested_is_active?"active":"disabled"));
+  int nthreads;
+  
+#if defined(_OPENMP)
 
-  if ( nested_is_active )
-    printf("maximum number of nested levels is %d\n", max_nest_level);
+  int order = 0;
+  
+#pragma omp parallel               // this creates a parallel region
+                                   // that is encompassed by the
+                                   // opening and closing { }
+                                   //
+                                   // you can modify the number of
+                                   // spawned threads through the
+                                   //   OMP_THREAD_NUM
+                                   // environmental variable
+  
+  {   
+    
+    int my_thread_id = omp_get_thread_num();
+    #pragma omp master
+    nthreads = omp_get_num_threads();
 
-#pragma omp parallel
-  {
-    int myid = omp_get_thread_num();
-    function( myid, 0 );
+                                   // now we impose an ordered output
+                                   // although not ina very efficient way
+
+        	                   // the "critical" directive identifies a
+        	                   // section that must be executed by a
+        	                   // single thread at a time.
+	                           // Here, un unspecified number of threads
+	                           // will print the message.
+	                           // That is just due to this particular
+	                           // case: in fact, ALL the threads will
+	                           // execute the if test. However, which are
+	                           // those that succeed, print and modify the
+	                           // "order" value depends on which have been
+	                           // the previous ones, and on the relative delay.
+#pragma omp critical                   
+    if ( order == my_thread_id )
+      {
+	printf( "\tgreetings from thread num %d\n", my_thread_id );	
+	order++;		   
+      }
   }
-
+#else
+  
+  nthreads = 1;
+#endif
+  
+  printf(" %d thread%s greeted you from the %sparallel region\n", nthreads, (nthreads==1)?" has":"s have", (nthreads==1)?"(non)":"" );
+  
   return 0;
-}
-
-
-int function( int id, int nested )
-{
-  int this_level = omp_get_active_level();
-  int max_level  = omp_get_max_active_levels();
-  int possible_parallelism = omp_get_max_threads();
-  printf("\tthread %2d at level %2d/%2d spawning %d threads\n", id, omp_get_active_level(), omp_get_level(), possible_parallelism );
-
-#pragma omp parallel if ( nested < max_level )
-  {
-    int myid = omp_get_thread_num();
-    printf("\t\tthread %2d,%2d in function\n", id, myid );
-    function( myid, this_level );
-  }
 }

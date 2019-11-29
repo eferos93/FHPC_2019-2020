@@ -45,10 +45,11 @@
 		  (double)ts.tv_nsec * 1e-9)
 #endif
 
+typedef unsigned int uint;
 
-double heavy_work_0( int );
-double heavy_work_1( int );
-double heavy_work_2( int );
+double heavy_work_0( uint, int );
+double heavy_work_1( uint, int );
+double heavy_work_2( uint, int );
 
 #if !defined( LARGE_WORK )
 #define LARGE_WORK 20000000
@@ -59,11 +60,15 @@ int main( int argc, char **argv )
   struct timespec ts;
   double results[3] = {0};
 
-  int check_addresses = 0;
+  int N = LARGE_WORK;
   if ( argc > 1 )
-    check_addresses = atoi( *(argv+1) );
+    N = (unsigned int) atoi(*(argv+1));
+  
+  int check_addresses = 0;
+  if ( argc > 2 )
+    check_addresses = atoi( *(argv+2) );
   else
-    printf("\nrun me with an argument != 0 if you want me to show that\n"
+    printf("\nrun me with a second argument != 0 if you want me to show that\n"
 	   " the addresses of the internal variables in heavy_work_*\n"
 	   " functions are all different for the different threads\n"
 	   " that may be executing the same functions.\n"
@@ -73,7 +78,14 @@ int main( int argc, char **argv )
   double tstart = CPU_TIME;
   
 #ifdef _OPENMP                                   // ---------- parallel execution
-#pragma omp parallel
+                                                 //  
+                                                 //  if N<= 10 the parallel region
+                                                 //  will not be created by spawning
+                                                 //  the requested number of threads;
+                                                 //  only the master thread will
+                                                 //  execute the code in the block.
+                                                 //  
+#pragma omp parallel if ( N > 10 )
   {
 #pragma omp master    
     printf("running %d threads\n", omp_get_num_threads() );
@@ -83,22 +95,24 @@ int main( int argc, char **argv )
     double result;
     
     if( myid % 3 == 0)
-      result = heavy_work_0(arg);
+      result = heavy_work_0( N, arg );
     else if ( myid % 3 == 1 )
-      result = heavy_work_1(arg);
+      result = heavy_work_1( N, arg);
     else if ( myid % 3 == 2 )
-      result = heavy_work_2(arg);
+      result = heavy_work_2( N, arg );
 
     if ( myid < 3 )
       results[myid] = result;
   }
 #else                                            // ---------- serial execution
+						 // 
 
-  results[0] = heavy_work_0();
-  results[1] = heavy_work_1();
-  results[2] = heavy_work_2();
+  results[0] = heavy_work_0( N, 0 );
+  results[1] = heavy_work_1( N, 0 );
+  results[2] = heavy_work_2( N, 0 );
   
 #endif                                           // ---------------------------
+						 // 
   
   double tend = CPU_TIME;
   
@@ -107,18 +121,23 @@ int main( int argc, char **argv )
 	 results[0] + results[1] + results[2],
 	 tend-tstart);
   
-  
+#if !defined(USE_THREAD_BASED_TIMER)
+  printf("\nnote: if you notice something strange about the timing, like the fact that\n"
+	 "the OpenMP timings is larger than the serial timings, you may consider to use\n"
+	 "a different CLOCK, like CLOCK_THREAD_CPUTIME_ID instead of CLOCK_PROCESS_CPUTIME_ID.\n"
+	 "To do that, compile this code with -DUSE_THREAD_BASED_TIMER\n");
+#endif
   return 0;
 }
 
 
-double heavy_work_0( int id )
+double heavy_work_0( uint N, int id )
 {
   double guess = 3.141572 / 3;
   if ( id >= 0)
     printf("\t[thread %2d] my guess address in %s is %p\n", id, __func__, &guess);
   
-  for( int i = 0; i < LARGE_WORK; i++ )
+  for( int i = 0; i < N; i++ )
     {
       guess = exp( guess );
       guess = sin( guess );
@@ -128,13 +147,13 @@ double heavy_work_0( int id )
   return guess;
 }
 
-double heavy_work_1( int id )
+double heavy_work_1( uint N, int id )
 {
   double guess = 3.141572 / 3;
   if ( id >= 0)
     printf("\t[thread %2d] my guess address in %s is %p\n", id, __func__, &guess);
 
-  for( int i = 0; i < LARGE_WORK; i++ )
+  for( int i = 0; i < N; i++ )
     {
       guess = log( guess );
       guess = exp( sqrt(guess)/guess );
@@ -143,13 +162,13 @@ double heavy_work_1( int id )
   return guess;
 }
 
-double heavy_work_2( int id )
+double heavy_work_2( uint N, int id )
 {
   double guess = 3.141572 / 3;
   if ( id >= 0)
     printf("\t[thread %2d] my guess address in %s is %p\n", id, __func__, &guess);
 
-  for( int i = 0; i < LARGE_WORK; i++ )
+  for( int i = 0; i < N; i++ )
     {
       guess = sqrt( guess );
       guess = exp( 1+1.0/guess );

@@ -24,6 +24,7 @@
  │                                                                            │
  * ────────────────────────────────────────────────────────────────────────── */
 
+
 #if defined(__STDC__)
 #  if (__STDC_VERSION__ >= 199901L)
 #     define _XOPEN_SOURCE 700
@@ -33,115 +34,75 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
 #include <omp.h>
 
 
-#if !defined(USE_THREAD_BASED_TIMER)
-#define CPU_TIME (clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &ts ), (double)ts.tv_sec +	\
-		  (double)ts.tv_nsec * 1e-9)
-#else
-#define CPU_TIME (clock_gettime( CLOCK_THREAD_CPUTIME_ID, &ts ), (double)ts.tv_sec +	\
-		  (double)ts.tv_nsec * 1e-9)
-#endif
-
-typedef unsigned int uint;
-
-double heavy_work_0( uint );
-double heavy_work_1( uint );
-double heavy_work_2( uint );
-
-#if !defined( LARGE_WORK )
-#define LARGE_WORK 20000000
-#endif
 
 int main( int argc, char **argv )
 {
-  struct timespec ts;
-  double results[3] = {0};
 
-  int N = LARGE_WORK;
-  if ( argc > 1 )
-    N = (unsigned int) atoi(*(argv+1));
-  
-  double tstart = CPU_TIME;
-  
-#ifdef _OPENMP                                   // ---------- parallel execution
-#pragma omp parallel if ( N > 10 )
+  long double PI              = 3.141592653589;
+  int         morning_coffees = 3;
+  char        passwd[]        = "DontAsk_DontTell";
+  int         passwd_len      = strlen(passwd);
+  int         final_mark;
+  int         Niter;
+  srand( time(NULL) );
+  Niter = rand() % 100;
+
+  printf("Niter: %d\n", Niter);
+  // usual exercise: inspect the address of the variables
+  printf("\nThe addresses of shared-memory variables are as follows:\n"
+	 "PI              : %12p [value is %12.9Lg]\n"
+	 "morning coffees : %12p [value is %12d]\n"
+	 "passwd          : %12p [value is %12s] (len is %td)\n"
+	 "final_mark      : %12p [value is %12d]\n\n",
+	 &PI, PI,
+	 &morning_coffees, morning_coffees,
+	 &passwd, passwd, strlen(passwd),
+	 &final_mark, final_mark );
+
+#pragma omp parallel firstprivate(PI, morning_coffees) private(passwd) shared(Niter)
   {
-#pragma omp master    
-    printf("running %d threads\n", omp_get_num_threads() );
-    
+    // usual exercise: inspect the address of the variables
+
     int myid = omp_get_thread_num();
-    double result;
+    int nthreads = omp_get_num_threads();
     
-    if( myid % 3 == 0)
-      result = heavy_work_0( N );
-    else if ( myid % 3 == 1 )
-      result = heavy_work_1( N );
-    else if ( myid % 3 == 2 )
-      result = heavy_work_2( N );
+    PI              += myid;
+    morning_coffees += myid;
+    printf("th %d, %td\n", myid, strlen(passwd));
+    sprintf( passwd, "p::%-*d", passwd_len-4, myid);
+    
+    int seed = myid;
 
-    if ( myid < 3 )
-      results[myid] = result;
+    #pragma omp for lastprivate(final_mark)
+    for ( int i = 0; i < Niter; i++)
+      final_mark = myid*100 + (rand_r(&seed) % 33);
+
+    printf("Thread %d\n\tThe addresses of private variables are as follows:\n"
+	   "\tPI              : %12p [value is %12.9Lg]\n"
+	   "\tmorning coffees : %12p [value is %12d]\n"
+	   "\tpasswd          : %12p [value is %12s] (len is %td)\n"
+	   "\tfinal_mark      : %12p [value is %12d]\n\n",
+	   myid, &PI, PI,
+	   &morning_coffees, morning_coffees,
+	   &passwd, passwd, strlen(passwd),
+	   &final_mark, final_mark );
+
   }
-#else                                            // ---------- serial execution
 
-  results[0] = heavy_work_0( N );
-  results[1] = heavy_work_1( N );
-  results[2] = heavy_work_2( N );
-  
-#endif                                           // ---------------------------
-  
-  double tend = CPU_TIME;
-  
-  printf("final result is (%g, %g, %g) %g\nachieved in %g seconds\n",
-	 results[0], results[1], results[2],
-	 results[0] + results[1] + results[2],
-	 tend-tstart);
-  
-  
+
+  printf("------------------------------------------\n"
+	 "The addresses of shared-memory variables are as follows:\n"
+	 "PI              : %12p [value is %12.9Lg]\n"
+	 "morning coffees : %12p [value is %12d]\n"
+	 "passwd          : %12p [value is %12s] (len is %td)\n"
+	 "final_mark      : %12p [value is %12d]\n",
+	 &PI, PI,
+	 &morning_coffees, morning_coffees,
+	 &passwd, passwd, strlen(passwd),
+	 &final_mark, final_mark );
+
   return 0;
-}
-
-
-
-double heavy_work_0( uint N )
-{
-  double guess = 3.141572 / 3;
-  
-  for( int i = 0; i < N; i++ )
-    {
-      guess = exp( guess );
-      guess = sin( guess );
-
-    }
-
-  return guess;
-}
-
-double heavy_work_1( uint N )
-{
-  double guess = 3.141572 / 3;
-
-  for( int i = 0; i < N; i++ )
-    {
-      guess = log( guess );
-      guess = exp( sqrt(guess)/guess );
-    }
-
-  return guess;
-}
-
-double heavy_work_2( uint N )
-{
-  double guess = 3.141572 / 3;
-
-  for( int i = 0; i < N; i++ )
-    {
-      guess = sqrt( guess );
-      guess = exp( 1+1.0/guess );
-    }
-
-  return guess;
 }

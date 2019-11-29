@@ -24,7 +24,11 @@
  *         be useful in some way
  */
 
-
+#if defined(__STDC__)
+#  if (__STDC_VERSION__ >= 199901L)
+#     define _XOPEN_SOURCE 700
+#  endif
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -34,20 +38,8 @@
 
 #define N_default 100
 
-#if defined(_OPENMP)
 #define CPU_TIME (clock_gettime( CLOCK_REALTIME, &ts ), (double)ts.tv_sec +	\
 		  (double)ts.tv_nsec * 1e-9)
-
-#define CPU_TIME_th (clock_gettime( CLOCK_THREAD_CPUTIME_ID, &myts ), (double)myts.tv_sec +	\
-		     (double)myts.tv_nsec * 1e-9)
-#else
-
-#define CPU_TIME (clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &ts ), (double)ts.tv_sec +	\
-		   (double)ts.tv_nsec * 1e-9)
-
-#endif
-
-
 
 
 
@@ -108,7 +100,6 @@ int main( int argc, char **argv )
 
 
   double S       = 0;                                       // this will store the summation
-  double runtime = 0;                                       // this will be the runtime
 
   double tstart  = CPU_TIME;
   
@@ -120,16 +111,16 @@ int main( int argc, char **argv )
 #else
 
   
-#pragma omp parallel reduction(+:runtime)
-  {
-    struct  timespec myts;
-    double mystart = CPU_TIME_th;
-#pragma omp for reduction(+:S)
+#pragma omp parallel for 
     for ( int ii = 0; ii < N; ii++ )
+<<<<<<< HEAD:D11/OpenMP/06a_sum_of_an_array__noscaling.c
+#pragma omp atomic //for single instructions
+=======
+      //#pragma omp atomic                                  // this op needs to be protected
+                                                            // if you keep it commentend, that
+							    // results in a data race       
+>>>>>>> 8144a4640bc7c671af21ebffca7460fca38867f8:D11/OpenMP/parallel_loops/00_array_sum_with_race.c
       S += array[ii];
-
-    runtime += CPU_TIME_th - mystart;
-  }
 
 #endif
 
@@ -141,7 +132,7 @@ int main( int argc, char **argv )
    *  -----------------------------------------------------------------------------
    */
 
-  printf("Sum is %g, process took %g of wall-clock time, <%g> sec of thread-time \n", S, tend - tstart, runtime/nthreads );
+  printf("Sum is %g, process took %g of wall-clock time\n", S, tend - tstart );
   
   free( array );
   return 0;

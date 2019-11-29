@@ -24,68 +24,58 @@
  │                                                                            │
  * ────────────────────────────────────────────────────────────────────────── */
 
+
 #if defined(__STDC__)
 #  if (__STDC_VERSION__ >= 199901L)
 #     define _XOPEN_SOURCE 700
 #  endif
 #endif
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/syscall.h>
 #include <omp.h>
 
 
 int main( int argc, char **argv )
 {
+  int    i;
 
-  int nthreads;
-  
-#if defined(_OPENMP)
+  register unsigned long long base_of_stack asm("rbp");
+  register unsigned long long top_of_stack asm("rsp");
 
-  int order = 0;
+  printf( "\nmain thread (pid: %d, tid: %ld) data:\n"
+	  "base of stack is: %p\n"
+	  "top of stack is : %p\n"
+	  "&i is           : %p\n"
+	  "   rbp - &i     : %td\n"
+	  "   &i - rsp     : %td\n"
+	  "\n\n",
+	  getpid(), syscall(SYS_gettid),
+	  (void*)base_of_stack,
+	  (void*)top_of_stack,
+	  &i,
+	  (void*)base_of_stack - (void*)&i,
+	  (void*)&i - (void*)top_of_stack );
   
-#pragma omp parallel               // this creates a parallel region
-                                   // that is encompassed by the
-                                   // opening and closing { }
-                                   //
-                                   // you can modify the number of
-                                   // spawned threads through the
-                                   //   OMP_THREAD_NUM
-                                   // environmental variable
-  
-  {   
+  // just try who is the private i for each thread
+#pragma omp parallel private(i)
+  {
+    int me = omp_get_thread_num();
+    unsigned long long my_stackbase;
+    __asm__("mov %%rbp,%0" : "=mr" (my_stackbase));
     
-    int my_thread_id = omp_get_thread_num();
-    #pragma omp master
-    nthreads = omp_get_num_threads();
-
-                                   // now we impose an ordered output
-                                   // although not ina very efficient way
-
-        	                   // the "critical" directive identifies a
-        	                   // section that must be executed by a
-        	                   // single thread at a time.
-	                           // Here, un unspecified number of threads
-	                           // will print the message.
-	                           // That is just due to this particular
-	                           // case: in fact, ALL the threads will
-	                           // execute the if test. However, which are
-	                           // those that succeed, print and modify the
-	                           // "order" value depends on which have been
-	                           // the previous ones, and on the relative delay.
-#pragma critical                   
-    if ( order == my_thread_id )
-      {
-	printf( "\tgreetings from thread num %d\n", my_thread_id );	
-	order++;		   
-      }
+    printf( "thread (tid: %ld) nr %d:\n"
+	    "\tmy base of stack is %p ( %td from main\'s stack )\n"
+	    "\tmy i address is %p\n"
+	    "\t\t%td from my stackbase and %td from main\'s\n",	    
+	    syscall(SYS_gettid), me,
+	    (void*)my_stackbase, (void*)base_of_stack - (void*)my_stackbase,
+	    &i, (void*)&i - (void*)my_stackbase, (void*)&i - (void*)base_of_stack);	    
   }
-#else
-  
-  nthreads = 1;
-#endif
-  
-  printf(" %d thread%s greeted you from the %sparallel region\n", nthreads, (nthreads==1)?" has":"s have", (nthreads==1)?"(non)":"" );
-  
+
+  printf( "\n" );  
   return 0;
 }
