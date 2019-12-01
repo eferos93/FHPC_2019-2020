@@ -113,6 +113,7 @@ int main( int argc, char **argv )
   
 #pragma omp parallel for 
     for ( int ii = 0; ii < N; ii++ )
+<<<<<<< HEAD
 <<<<<<< HEAD:D11/OpenMP/parallel_loops/00_array_sum_with_race.c
       //#pragma omp atomic                                  // this op needs to be protected
                                                             // if you keep it commentend, that
@@ -120,6 +121,15 @@ int main( int argc, char **argv )
 =======
 #pragma omp atomic //for single instructions
 >>>>>>> fa90b56d42df71d8f9680477e4b20225d5f8163a:D11/OpenMP/06a_sum_of_an_array__noscaling.c
+=======
+<<<<<<< HEAD:D11/OpenMP/06a_sum_of_an_array__noscaling.c
+#pragma omp atomic //for single instructions
+=======
+      //#pragma omp atomic                                  // this op needs to be protected
+                                                            // if you keep it commentend, that
+							    // results in a data race       
+>>>>>>> 8144a4640bc7c671af21ebffca7460fca38867f8:D11/OpenMP/parallel_loops/00_array_sum_with_race.c
+>>>>>>> 078e55c4d1669f664cc8d884132a98c934369e57
       S += array[ii];
 
 #endif
