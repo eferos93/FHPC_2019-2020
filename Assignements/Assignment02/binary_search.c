@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-
+#include <omp.h>
 
 #define CPU_TIME (clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &ts ), (double)ts.tv_sec + \
 		  (double)ts.tv_nsec * 1e-9)
@@ -67,8 +67,21 @@ int mybsearch(int *data, int N, int Key)
 
 int main(int argc, char **argv)
 {
-  int N, Nsearch, i;
+  int N, Nsearch, i, n_threads = 1;
   int *data, *search;
+
+  #ifndef _OPENMP
+    printf("serial binary search\n");
+  #else
+  #pragma omp parallel
+  {
+    #pragma omp master
+    {
+      n_threads = omp_get_num_threads();
+      printf("omp binary search with %d threads\n", n_threads );
+    }
+  }
+  #endif
 
   if(argc > 1)
     N = atoi( *(argv+1) );
@@ -83,15 +96,30 @@ int main(int argc, char **argv)
   printf("performing %d lookups on %d data..\n", Nsearch, N);
 
   printf("set-up data.."); fflush(stdout);
-  data = malloc(N * sizeof(int));
-  for (i = 0; i < N; i++)
-    data[i] = i;
+  data = (int*)malloc(N * sizeof(int));
+
+  #if defined(_OPENMP)
+    #pragma omp parallel for
+      for (i = 0; i < N; i++)
+        data[i] = i;
+  #else
+    for(i = 0; i < N; i++)
+      data[i] = i;
+  #endif
 
   printf(" set-up lookups.. "); fflush(stdout);  
-  search = malloc(Nsearch * sizeof(int));
+  search = (int*)malloc(Nsearch * sizeof(int));
   srand(time(NULL));
-  for (i = 0; i < Nsearch; i++)
-    search[i] = rand() % N;
+
+  #if defined(_OPENMP)
+    #pragma omp parallel for
+      for (i = 0; i < Nsearch; i++)
+        search[i] = rand() % N;
+  #else
+    for (i = 0; i < N; i++)
+      search[i] = rand() % N;
+  #endif
+    
 
   int found = 0;
   double tstart, tstop;
@@ -99,9 +127,18 @@ int main(int argc, char **argv)
 
   printf("\nstart cycle.. "); fflush(stdout);
   tstart = CPU_TIME;
-  for (i = 0; i < Nsearch; i++)
-    if( mybsearch(data, N, search[i]) >= 0)
-      found++;
+
+  #if defined(_OPENMP)
+    #pragma omp parallel for
+    for (i = 0; i < Nsearch; i++)
+      if( mybsearch(data, N, search[i]) >= 0)
+        found++;
+  #else
+    for ( i = 0; i < Nsearch; i++)
+      if(mybsearch(data, N, search[i]) >= 0)
+        found++;
+  #endif
+    
   tstop = CPU_TIME;
 
   printf("time elapsed: %g\n", tstop - tstart);
