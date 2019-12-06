@@ -78,11 +78,11 @@ int main( int argc, char **argv )
   if ( argc > 1 )
     N = atoi( *(argv+1) );
 
-  if ( (array = (double*)calloc( N, sizeof(double) )) == NULL )
+  if ( (array = (double*)calloc( N, sizeof(double) )) == NULL ) {
     printf("I'm sorry, on some thread there is not"
 	   "enough memory to host %lu bytes\n",
 	   N * sizeof(double) ); return 1;
-  
+  }
   // just give notice of what will happen and get the number of threads used
 #pragma omp parallel
   {
