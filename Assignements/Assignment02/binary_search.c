@@ -32,9 +32,16 @@
 #include <string.h>
 #include <omp.h>
 
-#define CPU_TIME (clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &ts ), (double)ts.tv_sec + \
-		  (double)ts.tv_nsec * 1e-9)
-
+#ifndef _OPENMP
+  #define CPU_TIME (clock_gettime( CLOCK_REALTIME, &ts ), (double)ts.tv_sec + \
+	                  (double)ts.tv_nsec * 1e-9)
+#else
+  #define CPU_TIME (clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &ts ), (double)ts.tv_sec + \
+	                  (double)ts.tv_nsec * 1e-9)
+#endif
+	                
+                    
+#define _GNU_SOURCE
 
 int mybsearch(int *data, int N, int Key)
  {
@@ -42,9 +49,8 @@ int mybsearch(int *data, int N, int Key)
    int register high = N;
    int register mid;
 
-   mid = (low + high) / 2;
    while(low <= high) {     
-
+     mid = (low + high) / 2;
      
      if(data[mid] < Key)
        low = mid + 1; 
@@ -52,8 +58,6 @@ int mybsearch(int *data, int N, int Key)
        high = mid - 1;
      else 
        return mid;
-
-     mid = (low + high) / 2;
    }
 
    /* if ( Key == data[low] ) */
@@ -112,7 +116,7 @@ int main(int argc, char **argv)
   srand(time(NULL));
 
   #if defined(_OPENMP)
-    #pragma omp parallel for
+   #pragma omp parallel for
       for (i = 0; i < Nsearch; i++)
         search[i] = rand() % N;
   #else
@@ -143,8 +147,8 @@ int main(int argc, char **argv)
 
   printf("time elapsed: %g\n", tstop - tstart);
 
-  free(data);
-  free(search);
+  //free(data);
+  //free(search);
 
   return 0;
  }

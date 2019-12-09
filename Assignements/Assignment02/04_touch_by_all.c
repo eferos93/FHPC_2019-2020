@@ -55,6 +55,7 @@
 #define CPU_ID_ENTRY_IN_PROCSTAT 39
 #define HOSTNAME_MAX_LENGTH      200
 
+#define _GNU_SOURCE
 int read_proc__self_stat ( int, int * );
 int get_cpu_id           ( void       );
 
