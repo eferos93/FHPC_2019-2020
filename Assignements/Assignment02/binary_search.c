@@ -32,7 +32,7 @@
 #include <string.h>
 #include <omp.h>
 
-#ifndef _OPENMP
+#ifdef _OPENMP
   #define CPU_TIME (clock_gettime( CLOCK_REALTIME, &ts ), (double)ts.tv_sec + \
 	                  (double)ts.tv_nsec * 1e-9)
 #else
@@ -51,7 +51,8 @@ int mybsearch(int *data, int N, int Key)
 
    while(low <= high) {     
      mid = (low + high) / 2;
-     
+     __builtin_prefetch (&data[(mid + 1 + high)/2], 0, 3);
+     __builtin_prefetch (&data[(low + mid - 1)/2], 0, 3);     
      if(data[mid] < Key)
        low = mid + 1; 
      else if(data[mid] > Key)

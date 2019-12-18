@@ -1,0 +1,88 @@
+SERIAL
+serial binary search
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 160.258
+PARALLEL
+omp binary search with 1 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 299.659
+omp binary search with 2 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 198.371
+omp binary search with 3 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 138.853
+omp binary search with 4 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 109.183
+omp binary search with 5 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 92.4499
+omp binary search with 6 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 79.4496
+omp binary search with 7 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 72.1947
+omp binary search with 8 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 66.5519
+omp binary search with 9 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 62.6775
+omp binary search with 10 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 58.7285
+omp binary search with 11 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 57.4563
+omp binary search with 12 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 53.6682
+omp binary search with 13 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 51.1968
+omp binary search with 14 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 50.2278
+omp binary search with 15 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 46.935
+omp binary search with 16 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 47.964
+omp binary search with 17 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 46.9667
+omp binary search with 18 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 45.8747
+omp binary search with 19 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 44.6945
+omp binary search with 20 threads
+performing 500000000 lookups on 1000000000 data..
+set-up data.. set-up lookups.. 
+start cycle.. time elapsed: 45.5062
+cn02-02 : flushing filesystem cache...
+cn02-02 : filesystem cache flushed

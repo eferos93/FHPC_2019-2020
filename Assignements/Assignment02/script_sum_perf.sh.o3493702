@@ -1,0 +1,7 @@
+omp summation with 20 threads
+Sum is 9.94142e+17, process took 0.534801 of wall-clock time
+
+<0.47907> sec of avg thread-time
+<0> sec of min thread-time
+cn01-09 : flushing filesystem cache...
+cn01-09 : filesystem cache flushed
