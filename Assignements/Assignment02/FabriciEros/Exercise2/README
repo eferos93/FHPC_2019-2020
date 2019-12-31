@@ -1,0 +1,2 @@
+compile with gcc 4.9.2
+remember to add -lrt flag when compiling the serial version

@@ -1,6 +1,0 @@
-omp binary search with 20 threads
-performing 1000000000 lookups on 1000000000 data..
-set-up data.. set-up lookups.. 
-start cycle.. time elapsed: 81.2583
-cn02-06 : flushing filesystem cache...
-cn02-06 : filesystem cache flushed
