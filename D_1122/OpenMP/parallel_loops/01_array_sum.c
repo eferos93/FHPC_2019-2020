@@ -78,7 +78,7 @@ int main( int argc, char **argv )
 
 
   // allocate memory
-  if ( (array = (double*)calloc( N, sizeof(double) )) == NULL )
+  if ( (array = (double*)malloc( N * sizeof(double) )) == NULL )
     {
       printf("I'm sorry, there is not enough memory to host %lu bytes\n", N * sizeof(double) );
       return 1;
@@ -89,13 +89,10 @@ int main( int argc, char **argv )
   printf("serial summation\n");
 #else
 #pragma omp parallel
-  {
 #pragma omp master
-    {
-      nthreads = omp_get_num_threads();
-      printf("omp summation with %d threads\n", nthreads );
-    }
-  }
+  nthreads = omp_get_num_threads();
+
+  printf("omp summation with %d threads\n", nthreads );
 #endif
 
   // initialize the array
@@ -138,10 +135,8 @@ int main( int argc, char **argv )
     for ( int ii = 0; ii < N; ii++ )
       S += array[ii];
 
-    double mytime = CPU_TIME_th - mystart; 
-    th_avg_time += mytime;
-    th_min_time  = (mytime < th_min_time)? mytime : th_min_time;
-    
+    th_avg_time  = CPU_TIME_th - mystart; 
+    th_min_time  = CPU_TIME_th - mystart;     
   }
 
 #endif
