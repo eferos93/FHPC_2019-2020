@@ -82,14 +82,14 @@ int main( int argc, char **argv )
     printf("this machine is %s\n", (LITTLE_ENDIAN)?"little endian":"big endian");
     
     if ( argc > 1 )
-      {
-	maxval = atoi( *(argv+1) ) % 65536;
-	if ( argc > 3 )
-	  {
-	    xsize = atoi( *(argv+2) );
-	    ysize = atoi( *(argv+2) );
-	  }
-      }
+    {
+	    maxval = atoi( *(argv+1) ) % 65536;
+	    if ( argc > 3 )
+	    {
+	      xsize = atoi( *(argv+2) );
+	      ysize = atoi( *(argv+2) );
+	    }
+    }
 
 
     int minval      = 0; 
